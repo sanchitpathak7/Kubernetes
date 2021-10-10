@@ -202,22 +202,29 @@ We will need two tools on the client machine: the Cloud Flare SSL tool to genera
 
 #### Installing cfssl
 1. Download the binaries.
-
+```
 [root@sanchit-km1 ~]# wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 [root@sanchit-km1 ~]# wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+```
 
 2. Add the execution permission to the binaries.
+```
 [root@sanchit-km1 ~]# chmod +x cfssl*
+```
 
 3. Move the binaries to /usr/local/bin.
+```
 [root@sanchit-km1 ~]# sudo mv cfssl_linux-amd64 /usr/local/bin/cfssl
 [root@sanchit-km1 ~]# sudo mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+```
 
 4. Verify the installation
+```
 [root@sanchit-km1 ~]# /usr/local/bin/cfssl version
 Version: 1.2.0
 Revision: dev
 Runtime: go1.6
+```
 
 #### Generating the TLS certificates
 
