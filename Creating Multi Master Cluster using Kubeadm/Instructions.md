@@ -124,6 +124,7 @@ WARNING: Access to the remote API on a privileged Docker daemon is equivalent
          documentation for details: https://docs.docker.com/go/attack-surface/
 
 ================================================================================
+```
 
 ```
 [root@sanchit-km1 ~]# cat /etc/docker/daemon.json
