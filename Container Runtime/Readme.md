@@ -12,7 +12,8 @@ Different popular runtimes are:
 #### What is Containerd?
 It is a high-level container runtime. It is a daemon that manages the complete container lifecycle on a single host: creates, starts, stops containers, pulls and stores images, configures mounts, networking, etc.
 
-Containerd content store: /var/lib/containerd/io.containerd.content.v1.content
+Containerd content store: 
+```/var/lib/containerd/io.containerd.content.v1.content```
 
 ### ContainerD with Docker
 Docker => DockerD => Containerd => OCI Spec/Runc => Containers
