@@ -1,17 +1,18 @@
 #### Container Runtime: 
-    => Software that's responsible for pulling and running container images.
-    => Kubernetes 1.5 introduced an internal plugin API named Container Runtime Interface (CRI) to provide easy access to different container runtimes.
+Software that's responsible for pulling and running container images.
 
-    Different popular runtimes are:
-        1. Docker
-        2. Containerd
-        3. CRI-O
+Kubernetes 1.5 introduced an internal plugin API named Container Runtime Interface (CRI) to provide easy access to different container runtimes.
+
+Different popular runtimes are:
+1. Docker
+2. Containerd
+3. CRI-O
 
 
 #### What is Containerd?
-=> It is a high-level container runtime. It is a daemon that manages the complete container lifecycle on a single host: creates, starts, stops containers, pulls and stores images, configures mounts, networking, etc.
+It is a high-level container runtime. It is a daemon that manages the complete container lifecycle on a single host: creates, starts, stops containers, pulls and stores images, configures mounts, networking, etc.
 
-=> Containerd content store: /var/lib/containerd/io.containerd.content.v1.content
+Containerd content store: /var/lib/containerd/io.containerd.content.v1.content
 
 ### ContainerD with Docker
 Docker => DockerD => Containerd => OCI Spec/Runc => Containers
@@ -37,12 +38,12 @@ Kubelet Endpoints:
 
 
 ### Problem with Docker as Runtime
-    => Kubernetes is deprecating Docker as container runtime after v1.20.
-    => Docker containers are still supported, but the dockershim/docker, the layer between Kubernetes and containerd is deprecated and will be removed from version 1.22+.
+Kubernetes is deprecating Docker as container runtime after v1.20.
+Docker containers are still supported, but the dockershim/docker, the layer between Kubernetes and containerd is deprecated and will be removed from version 1.22+.
 
 ### Do we keep using Dockerfiles?
-    => Docker is still useful in many ways. The image that Docker produces isn't really a Docker specific image - it's an OCI (Open Container Initiative) image.
-    => Any OCI complaint image, regardless of the tool one uses to built it, will look the same to Kubernetes.
+Docker is still useful in many ways. The image that Docker produces isn't really a Docker specific image - it's an OCI (Open Container Initiative) image.
+Any OCI complaint image, regardless of the tool one uses to built it, will look the same to Kubernetes.
 
 ### Change from Docker Shim to Containerd CRI
 
@@ -69,9 +70,11 @@ kubelet paramters
 --container-runtime=remote
 --container-runtime-endpoint=unix:///run/containerd/containerd.sock
 
+```
 $ less kubelet.INFO | grep -e container-runtime-endpoint -e container-runtime
 I1011 23:33:17.743347 3362862 flags.go:59] FLAG: --container-runtime="docker"
 I1011 23:33:17.743350 3362862 flags.go:59] FLAG: --container-runtime-endpoint="unix:///var/run/dockershim.sock"
+```
 
 ### CONTAINERD CLIENTs
 
@@ -129,6 +132,7 @@ cgroup driver: cgroupfs vs systemd
 - - + 
 DOCKER
 
+```
 $ cat /etc/docker/daemon.json
 {
     "bridge": "none",
@@ -145,16 +149,16 @@ $ cat /etc/docker/daemon.json
     "debug": false,
     "registry-mirrors": ["https://dockermirror.platform9.io/"]
 }
+```
 
 
 
-
-
+```
 curl --request POST --url https://cse.platform9.io/qbert/v4/b855dca4be144f089b68dcff7c39f820/clusters/e3f58795-5805-49cf-81fb-768fd6d686d6/upgrade\?type\=minor --header "X-Auth-Token: $TOKEN" --header 'Content-Type: application/json' --header 'cache-control: no-cache' -d '{ "containerRuntime": "containerd" }'
 OK%
+```
 
-
-
+```
 [2021-10-27 04:33:37] Generating config.toml
 --- /opt/pf9/pf9-kube/master_scripts/045-start_container_runtime.sh start at 2021-10-27 04:33:39 ---
 [2021-10-27 04:33:40] docker configuration: http proxy configuration not detected
@@ -195,49 +199,55 @@ one
 [2021-10-27 04:34:03] kubelet configuration: http proxy configuration not detected
 [2021-10-27 04:34:03] Starting kubelet
 --- /opt/pf9/pf9-kube/master_scripts/090-kube_proxy_start.sh start at 2021-10-27 04:34:05 ---
+```
 
-
-
+```
 $ cat /etc/containerd/config.toml | grep disabled
 disabled_plugins = []
+```
 
-
+```
 $ less kubelet.INFO | grep -e container-runtime-endpoint -e container-runtime
 I1027 04:35:20.616072 1541827 flags.go:59] FLAG: --container-runtime="remote"
 I1027 04:35:20.616089 1541827 flags.go:59] FLAG: --container-runtime-endpoint="unix:///run/containerd/containerd.sock"
+```
 
+```
 $ sudo /opt/pf9/pf9-kube/bin/nerdctl -n k8s.io ps
 CONTAINER ID    IMAGE                                                                      COMMAND                   CREATED           STATUS    PORTS    NAMES
 00e4238ede6c    k8s.gcr.io/kube-scheduler:v1.21.3                                          "kube-scheduler --co…"    42 minutes ago    Up
 0ba9932dd996    gcr.io/etcd-development/etcd:v3.4.14                                       "/usr/local/bin/etcd"     42 minutes ago    Up                 etcd
+```
 
+```
 $ sudo /opt/pf9/pf9-kube/bin/crictl -r unix:///run/containerd/containerd.sock ps
 CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID
 20532b652f259       50b52cdadbcf0       33 minutes ago      Running             calico-node               2                   c9d976f3f619f
 37801cb77625e
+```
 
+```
 $ sudo ctr -n k8s.io containers list
 CONTAINER                                                           IMAGE                                                                                                          RUNTIME
 00e4238ede6cfb204962644322986966ce69cb0997990d49e3942d0816e08dbe    k8s.gcr.io/kube-scheduler:v1.21.3                                                                              io.containerd.runc.v2
 0ba9932dd9967f6a5d4b6dcf29509d90eb4ed933fccbcfd9404b88b46a5f92d6    gcr.io/etcd-development/etcd:v3.4.14                                                                           io.containerd.runc.v2
+```
 
-
-
-Image Management
+### Image Management
 When we download an image from the OCI registry, the image and all its content are loaded into the content store. Containerd has content store, under containerd's local storage space, for example, on a standard Linux installation at /var/lib/containerd/io.containerd.content.v1.content
 
+```
 # tree /var/lib/containerd/io.containerd.content.v1.content/blobs/sha256/
 /var/lib/containerd/io.containerd.content.v1.content/blobs/sha256/
 ├── 020336b75c4893f1849758800d6f98bb2718faf3e5c812f91ce9fc4dfb69543b
 ├── 0a02d75339eaca89fcca3a8f39b69afba2cff13964c6d3a6a470e508ab4b43e4
 ├── 0c96386ac8cc1801fe7dfb7e4d41df94436490b9a11fae9b44db55e45a99df27
 ├── 0f938ef24c3b0163d5036348401191c8a33108c0e685541534b867fc6a6de78b
+```
 
 More information on Content Flow:  https://github.com/containerd/containerd/blob/main/docs/content-flow.md 
 
-
-
-Namespaces:
+### Namespaces
 
 Containerd supports namespaces at the container runtime level. These namespaces are completely different from the kubernetes namespaces. Containerd namespaces are used to provides isolation to different applications that might be using containerd like docker, kubelet, etc. Well-known namespaces -
 
