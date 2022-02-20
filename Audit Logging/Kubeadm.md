@@ -93,7 +93,7 @@ spec:
  ```
 #### APIServer Container Post Manifest File Changes
 ```
- controlplane $ crictl ps | grep kube-apiserver
+controlplane $ crictl ps | grep kube-apiserver
 a7c151dff1d2e       b6d7abedde399       About a minute ago   Running             kube-apiserver            7                   cade8bb19f703
 ```
 #### Audit Log File Created
