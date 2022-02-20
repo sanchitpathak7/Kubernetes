@@ -1,5 +1,5 @@
 ## Audit Logging using Kubeadm
-Single Node Cluster
+#### Single Node Cluster
 
 ```
 controlplane $ kubectl get nodes
@@ -7,14 +7,14 @@ NAME           STATUS   ROLES                  AGE   VERSION
 controlplane   Ready    control-plane,master   16d   v1.23.1
 ```
 
-### Creating Audit-Logs Directory
+#### Creating Audit-Logs Directory
 ```
 controlplane $ mkdir /etc/kubernetes/audit-logs
 controlplane $ ls -lrt /etc/kubernetes/audit-logs
 total 0
 ```
 
-### Creating Audit Policy File
+#### Creating Audit Policy File
 ```
 controlplane $ cat /etc/kubernetes/audit-policy/policy.yaml
 apiVersion: audit.k8s.io/v1
@@ -51,7 +51,7 @@ rules:
     - "RequestReceived"
 ```
 
-### Changes to APIServer Manifest File
+#### Changes to APIServer Manifest File
 ```
 controlplane $ cat /etc/kubernetes/manifests/kube-apiserver.yaml 
 apiVersion: v1
@@ -95,26 +95,26 @@ spec:
     name: audit-log
  ```
 
-### APIServer Container Post Manifest File Changes
+#### APIServer Container Post Manifest File Changes
 ```
  controlplane $ crictl ps | grep kube-apiserver
 a7c151dff1d2e       b6d7abedde399       About a minute ago   Running             kube-apiserver            7                   cade8bb19f703
 ```
 
-### Audit Log File Created
+#### Audit Log File Created
 ```
 controlplane $ ls -lrt /etc/kubernetes/audit-logs
 total 2080
 -rw------- 1 root root 2127740 Feb 20 03:38 audit.log
 ```
 
-### Test Namespace Creation
+#### Test Namespace Creation
 ```
 controlplane $ kubectl create namespace testaudit
 namespace/testaudit created
 ```
 
-### RequestResponse Audit Log in File 
+#### RequestResponse Audit Log in File 
 ```
 controlplane $ cat /etc/kubernetes/audit-logs/audit.log
 {"kind":"Event","apiVersion":"audit.k8s.io/v1","level":"RequestResponse","auditID":"76c364a9-3040-49df-a53e-7489452f30a1","stage":"ResponseComplete","requestURI":"/api/v1/namespaces?fieldManager=kubectl-create","verb":"create","user":{"username":"kubernetes-admin","groups":["system:masters","system:authenticated"]},"sourceIPs":["172.30.1.2"],"userAgent":"kubectl/v1.23.1 (linux/amd64) kubernetes/86ec240","objectRef":{"resource":"namespaces","name":"testaudit","apiVersion":"v1"},"responseStatus":{"metadata":{},"code":201},"requestObject":{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"testaudit","creationTimestamp":null,"labels":{"kubernetes.io/metadata.name":"testaudit"}},"spec":{},"status":{"phase":"Active"}},"responseObject":{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"testaudit","uid":"b3bd492b-debc-40d4-bff8-2da0dbb04be4","resourceVersion":"5409","creationTimestamp":"2022-02-20T03:39:41Z","labels":{"kubernetes.io/metadata.name":"testaudit"},"managedFields":[{"manager":"kubectl-create","operation":"Update","apiVersion":"v1","time":"2022-02-20T03:39:41Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:labels":{".":{},"f:kubernetes.io/metadata.name":{}}}}}]},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},"requestReceivedTimestamp":"2022-02-20T03:39:41.238907Z","stageTimestamp":"2022-02-20T03:39:41.249782Z","annotations":{"authorization.k8s.io/decision":"allow","authorization.k8s.io/reason":""}}
