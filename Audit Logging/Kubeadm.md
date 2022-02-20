@@ -6,14 +6,12 @@ controlplane $ kubectl get nodes
 NAME           STATUS   ROLES                  AGE   VERSION
 controlplane   Ready    control-plane,master   16d   v1.23.1
 ```
-
 #### Creating Audit-Logs Directory
 ```
 controlplane $ mkdir /etc/kubernetes/audit-logs
 controlplane $ ls -lrt /etc/kubernetes/audit-logs
 total 0
 ```
-
 #### Creating Audit Policy File
 ```
 controlplane $ cat /etc/kubernetes/audit-policy/policy.yaml
@@ -50,7 +48,6 @@ rules:
   omitStages: 
     - "RequestReceived"
 ```
-
 #### Changes to APIServer Manifest File
 ```
 controlplane $ cat /etc/kubernetes/manifests/kube-apiserver.yaml 
@@ -94,26 +91,22 @@ spec:
       type: DirectoryOrCreate
     name: audit-log
  ```
-
 #### APIServer Container Post Manifest File Changes
 ```
  controlplane $ crictl ps | grep kube-apiserver
 a7c151dff1d2e       b6d7abedde399       About a minute ago   Running             kube-apiserver            7                   cade8bb19f703
 ```
-
 #### Audit Log File Created
 ```
 controlplane $ ls -lrt /etc/kubernetes/audit-logs
 total 2080
 -rw------- 1 root root 2127740 Feb 20 03:38 audit.log
 ```
-
 #### Test Namespace Creation
 ```
 controlplane $ kubectl create namespace testaudit
 namespace/testaudit created
 ```
-
 #### RequestResponse Audit Log in File 
 ```
 controlplane $ cat /etc/kubernetes/audit-logs/audit.log
