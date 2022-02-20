@@ -20,7 +20,7 @@ Docker => DockerD => Containerd => OCI Spec/Runc => Containers
 
 When you run a container with docker, you're actually running it through the Docker daemon, containerd, and then runc.
 
-Screen Shot 2021-10-26 at 8.19.37 PM
+
 
 ### Docker as runtime with Kubernetes
 Kubectl => Kubelet => (CRI) => dockershim [over Unix Socket and using grpc framework i.e. 2 services image and runtime] => docker => Containerd => Containers
