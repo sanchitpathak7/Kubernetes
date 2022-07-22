@@ -1,3 +1,5 @@
+# Pod to Pod Communication between Nodes with Calico
+
 ## 3 Node Cluster
 
 $ kubectl get nodes
@@ -21,7 +23,7 @@ eabab459f3f5        nginx                                              "/docker-
 954f6b2320f9        localhost:5100/pause:3.2                           "/pause"                 5 hours ago         Up 5 hours                              k8s_POD_multi-container-pod_default_79243492-822f-49f4-9690-1f31a6a209b6_0
 
 
-Inside the pod network namespace, an interface is created, and an IP address is assigned.
+### Inside the pod network namespace, an interface is created, and an IP address is assigned.
 
 $ sudo docker inspect --format '{{ .State.Pid }}' eabab459f3f5
 24009
