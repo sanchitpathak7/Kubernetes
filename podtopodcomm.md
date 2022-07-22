@@ -133,6 +133,13 @@ $ sudo lsns -p 25278 | grep net
 --
 ### Pod to Pod Communication across Nodes
 
+#### Traffic Flow via Calico
+The key thing is to remember is how Calico programs the chain. All traffic to the pod go through the chain (cali-tw-<cali**>). All traffic from the pod go through the chain (cali-fw-<cali**>). The core principle of calico networking is IP routing, and each container or virtual machine is assigned a workload-endpoint (wl).
+
+The message sent from ConA to ConB is received by wl-A of nodeA, and is forwarded to nodeB after passing through various iptables rules according to the routing rules on nodeA.
+
+Nodes exchange routing information through the BGP protocol. Each node runs a soft routing software bird and is set as a BGP Speaker to exchange routing information with other nodes through the BGP protocol.
+
 #### Ping to Pod multi-container-pod2 from Pod multi-container-pod
 
 ```
@@ -158,13 +165,6 @@ listening on cali97e50e215bd, link-type EN10MB (Ethernet), capture size 262144 b
 15:45:52.306851 IP 10.20.127.150 > 10.20.225.119: ICMP echo reply, id 32, seq 2, length 64
 ```
 
-#### Traffic Flow via Calico
-The key thing is to remember is how Calico programs the chain. All traffic to the pod go through the chain (cali-tw-<cali**>). All traffic from the pod go through the chain (cali-fw-<cali**>). The core principle of calico networking is IP routing, and each container or virtual machine is assigned a workload-endpoint (wl).
-
-The message sent from ConA to ConB is received by wl-A of nodeA, and is forwarded to nodeB after passing through various iptables rules according to the routing rules on nodeA.
-
-Nodes exchange routing information through the BGP protocol. Each node runs a soft routing software bird and is set as a BGP Speaker to exchange routing information with other nodes through the BGP protocol.
-
 ```
 # watch -d iptables -L cali-fw-cali97e50e215bd -vn
 Every 2.0s: iptables -L cali-fw-cali97e50e215bd -vn                                                                                   Fri Jul 22 15:42:13 2022
@@ -187,7 +187,7 @@ ch 0x10000/0x10000
     0     0 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* cali:CMmm2WadvIezQ30g */ /* Drop if no profiles matched */
 ```
 
-On Destination Node 10.128.146.71
+#### On Destination Node 10.128.146.71
 
 ```
 # sudo tcpdump -i calie92f8848552
