@@ -1,6 +1,6 @@
 # Pod to Pod Communication between Nodes with Calico
 
-## 3 Node Cluster
+### 3 Node Cluster
 ```
 $ kubectl get nodes
 NAME             STATUS   ROLES    AGE   VERSION
@@ -9,7 +9,7 @@ NAME             STATUS   ROLES    AGE   VERSION
 10.128.147.235   Ready    master   91d   v1.20.15
 ```
 
-### Standalone pods deployed on 2 different nodes.
+#### Standalone pods deployed on 2 different nodes.
 ```
 $ kubectl get pods -o wide
 NAME                   READY   STATUS    RESTARTS   AGE     IP              NODE             
@@ -17,7 +17,7 @@ multi-container-pod    2/2     Running   0          4h42m   10.20.225.119   10.1
 multi-container-pod2   2/2     Running   0          3m49s   10.20.127.150   10.128.146.71
 ```
 
-### For Pod multi-container-pod on Node 10.128.146.244
+#### For Pod multi-container-pod on Node 10.128.146.244
 ```
 $ sudo docker ps | grep multi
 eabab459f3f5        nginx                                              "/docker-entrypoint.…"   5 hours ago         Up 5 hours                              k8s_container-2_multi-container-pod_default_79243492-822f-49f4-9690-1f31a6a209b6_0
@@ -73,7 +73,7 @@ $ ip link show | grep -A1 ^1293
     link/ether ee:ee:ee:ee:ee:ee brd ff:ff:ff:ff:ff:ff link-netnsid 3
 ```
 
-### Network Plumbing
+#### Network Plumbing
 Each newly created pod on the node will be set up with a veth pair like this.
 
 The pause process again, and this time it's holding the network namespace hostage. This pause container is responsible for creating and holding the network namespace. Just before the pod is deployed and container created, (among other things) it's the runtime responsibility to create the network namespace. Instead of running ip netns and creating the network namespace manually, the container runtime does this automatically. It contains very little code and instantly goes to sleep as soon as deployed. If one of the containers inside the pod crashes, the remaining can still reply to any network requests.
@@ -88,7 +88,7 @@ The pause process again, and this time it's holding the network namespace hostag
 
 ---
 
-### For Pod multi-container-pod2 on Node 10.128.146.71
+#### For Pod multi-container-pod2 on Node 10.128.146.71
 ```
 $ sudo docker ps | grep multi
 f28eff85e429        nginx                                              "/docker-entrypoint.…"   14 minutes ago      Up 14 minutes                           k8s_container-2_multi-container-pod2_default_85dda6df-b334-4ae5-ae13-dd1652aa4abb_0
@@ -131,9 +131,9 @@ $ sudo lsns -p 25278 | grep net
 ```
 
 --
-## Pod to Pod Communication across Nodes
+### Pod to Pod Communication across Nodes
 
-### Ping to Pod multi-container-pod2 from Pod multi-container-pod
+#### Ping to Pod multi-container-pod2 from Pod multi-container-pod
 
 ```
 $ kubectl exec -it multi-container-pod -- /bin/sh
@@ -144,7 +144,7 @@ PING 10.20.127.150 (10.20.127.150): 56 data bytes
 64 bytes from 10.20.127.150: seq=2 ttl=62 time=0.799 ms
 ```
 
-### On Source Node 10.128.146.244
+#### On Source Node 10.128.146.244
 
 ```
 # sudo tcpdump -i cali97e50e215bd
@@ -158,7 +158,7 @@ listening on cali97e50e215bd, link-type EN10MB (Ethernet), capture size 262144 b
 15:45:52.306851 IP 10.20.127.150 > 10.20.225.119: ICMP echo reply, id 32, seq 2, length 64
 ```
 
-### Traffic Flow via Calico
+#### Traffic Flow via Calico
 The key thing is to remember is how Calico programs the chain. All traffic to the pod go through the chain (cali-tw-<cali**>). All traffic from the pod go through the chain (cali-fw-<cali**>). The core principle of calico networking is IP routing, and each container or virtual machine is assigned a workload-endpoint (wl).
 
 The message sent from ConA to ConB is received by wl-A of nodeA, and is forwarded to nodeB after passing through various iptables rules according to the routing rules on nodeA.
